@@ -49,11 +49,11 @@ router.get('/', async (_, res) => {
       });
     }
 
-    config['openaiApiKey'] = getOpenaiApiKey();
-    config['ollamaApiUrl'] = getOllamaApiEndpoint();
-    config['anthropicApiKey'] = getAnthropicApiKey();
-    config['groqApiKey'] = getGroqApiKey();
-    config['geminiApiKey'] = getGeminiApiKey();
+    // config['openaiApiKey'] = getOpenaiApiKey();
+    // config['ollamaApiUrl'] = getOllamaApiEndpoint();
+    // config['anthropicApiKey'] = getAnthropicApiKey();
+    // config['groqApiKey'] = getGroqApiKey();
+    // config['geminiApiKey'] = getGeminiApiKey();
 
     res.status(200).json(config);
   } catch (err: any) {
@@ -77,7 +77,7 @@ router.post('/', async (req, res) => {
     },
   };
 
-  updateConfig(updatedConfig);
+  // updateConfig(updatedConfig);
 
   res.status(200).json({ message: 'Config updated' });
 });

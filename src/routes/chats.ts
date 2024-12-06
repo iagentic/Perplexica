@@ -1,18 +1,48 @@
 import express from 'express';
 import logger from '../utils/logger';
 import db from '../db/index';
-import { eq } from 'drizzle-orm';
+import { eq, sql} from 'drizzle-orm';
 import { chats, messages } from '../db/schema';
 
 const router = express.Router();
 
-router.get('/', async (_, res) => {
+router.get('/', async (req, res) => {
   try {
-    let chats = await db.query.chats.findMany();
+    let userSessionId = req.headers['user-session-id'] ? req.headers['user-session-id'].toString() : '';
+    if (userSessionId == '') {
+      return res.status(200).json({ chats: []});
+    }
 
-    chats = chats.reverse();
+    let chatRecords = await db.query.chats.findMany({
+      where: eq(chats.userSessionId, userSessionId),
+    });
 
-    return res.status(200).json({ chats: chats });
+    chatRecords = chatRecords.reverse();
+    let maxRecordLimit = 20;
+
+    if (chatRecords.length > maxRecordLimit) {
+      const deleteChatsQuery = sql`DELETE FROM chats
+        WHERE usersessionid = ${userSessionId} AND (
+          timestamp IS NULL OR 
+          timestamp NOT IN (
+            SELECT timestamp 
+            FROM chats 
+            WHERE usersessionid = ${userSessionId} 
+            ORDER BY timestamp DESC 
+            LIMIT ${maxRecordLimit}
+          )
+        )
+      `;
+      await db.run(deleteChatsQuery);
+      const deleteMessagesQuery = sql`DELETE FROM messages
+        WHERE chatid NOT IN (
+          SELECT id 
+          FROM chats
+        )
+      `;
+      await db.run(deleteMessagesQuery);
+    }
+    return res.status(200).json({ chats: chatRecords });
   } catch (err) {
     res.status(500).json({ message: 'An error has occurred.' });
     logger.error(`Error in getting chats: ${err.message}`);

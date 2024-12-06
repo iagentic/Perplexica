@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM node:lts-alpine
 
 WORKDIR /home/perplexica
 
