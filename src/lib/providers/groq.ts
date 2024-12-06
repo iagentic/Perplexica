@@ -9,19 +9,7 @@ export const loadGroqChatModels = async () => {
 
   try {
     const chatModels = {
-      'llama-3.1-8b-instant': {
-        displayName: 'Llama 3.1 8B',
-        model: new ChatOpenAI(
-          {
-            openAIApiKey: groqApiKey,
-            modelName: 'llama-3.1-8b-instant',
-            temperature: 0.7,
-          },
-          {
-            baseURL: 'https://api.groq.com/openai/v1',
-          },
-        ),
-      },
+
       'llama-3.2-3b-preview': {
         displayName: 'Llama 3.2 3B',
         model: new ChatOpenAI(
